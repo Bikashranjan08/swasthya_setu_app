@@ -1,8 +1,9 @@
-
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_app/screens/add_health_record_screen.dart';
+import 'package:mobile_app/screens/video_call_screen.dart';
+import 'package:mobile_app/screens/chat_screen.dart';
+import 'package:mobile_app/widgets/custom_app_bar.dart';
 
 class PatientDetailsScreen extends StatelessWidget {
   final String patientId;
@@ -12,8 +13,8 @@ class PatientDetailsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Patient Details'),
+      appBar: const CustomAppBar(
+        title: Text('Patient Details'),
       ),
       body: Column(
         children: [
@@ -107,19 +108,69 @@ class PatientDetailsScreen extends StatelessWidget {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => AddHealthRecordScreen(patientId: patientId),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: FutureBuilder<DocumentSnapshot>(
+        future: FirebaseFirestore.instance.collection('patients').doc(patientId).get(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Container(); // Or a loading indicator
+          }
+          if (snapshot.hasError || !snapshot.hasData || !snapshot.data!.exists) {
+            return Container(); // Handle error or patient not found
+          }
+
+          final patientData = snapshot.data!.data() as Map<String, dynamic>;
+          final patientName = patientData['name'] ?? 'Patient';
+
+          return Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                FloatingActionButton.extended(
+                  heroTag: 'addRecord',
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => AddHealthRecordScreen(patientId: patientId),
+                      ),
+                    );
+                  },
+                  label: const Text('Add Record'),
+                  icon: const Icon(Icons.note_add),
+                ),
+                FloatingActionButton.extended(
+                  heroTag: 'videoCall',
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => VideoCallScreen(patientId: patientId, patientName: patientName),
+                      ),
+                    );
+                  },
+                  label: const Text('Video Call'),
+                  icon: const Icon(Icons.video_call),
+                ),
+                FloatingActionButton.extended(
+                  heroTag: 'chat',
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ChatScreen(patientId: patientId, patientName: patientName),
+                      ),
+                    );
+                  },
+                  label: const Text('Chat'),
+                  icon: const Icon(Icons.chat),
+                ),
+              ],
             ),
           );
         },
-        tooltip: 'Add Health Record',
-        child: const Icon(Icons.note_add),
       ),
     );
   }
 }
-

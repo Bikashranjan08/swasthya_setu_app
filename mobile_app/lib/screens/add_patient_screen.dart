@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart'; // New import
+import 'package:mobile_app/widgets/custom_app_bar.dart';
 
 class AddPatientScreen extends StatefulWidget {
   const AddPatientScreen({super.key});
@@ -70,8 +71,8 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Add New Patient'),
+      appBar: const CustomAppBar(
+        title: Text('Add New Patient'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

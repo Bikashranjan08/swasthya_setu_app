@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_app/widgets/custom_app_bar.dart';
 
 class RoleSelectionScreen extends StatelessWidget {
   const RoleSelectionScreen({super.key});
@@ -6,9 +7,9 @@ class RoleSelectionScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Select Your Role'),
-        centerTitle: true,
+      appBar: const CustomAppBar(
+        title: Text('Select Your Role'),
+        // No leading or actions in original, so none here.
       ),
       body: Padding(
         padding: const EdgeInsets.all(24.0),

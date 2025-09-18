@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart'; // Added for Firestore operations
+import 'package:mobile_app/widgets/custom_app_bar.dart';
 
 class LoginScreen extends StatefulWidget {
   // Step 2: Modify constructor to accept selectedRole
@@ -50,7 +51,7 @@ class _LoginScreenState extends State<LoginScreen> {
           'uid': user.uid,
         });
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Registration successful!')),
+          const SnackBar(content: Text('Registration successful!')), 
         );
         // Navigate to home screen after successful registration
         Navigator.of(context).pushReplacementNamed('/');
@@ -72,7 +73,7 @@ class _LoginScreenState extends State<LoginScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('An unexpected error occurred: $e')),
       );
-      print('Unexpected registration error: $e');
+      print('Unexpected login error: $e');
     }
   }
 
@@ -94,7 +95,7 @@ class _LoginScreenState extends State<LoginScreen> {
         password: password,
       );
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Login successful!')),
+        const SnackBar(content: Text('Login successful!')), 
       );
       // Navigate to home screen after successful login
       Navigator.of(context).pushReplacementNamed('/');
@@ -122,7 +123,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
+      appBar: CustomAppBar(
         // Dynamic AppBar title based on _isLogin state
         title: Text(_isLogin ? 'Login' : 'Register'),
       ),

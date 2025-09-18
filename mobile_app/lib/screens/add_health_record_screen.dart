@@ -1,6 +1,8 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart'; // Import for debugPrint
+import 'package:mobile_app/widgets/custom_app_bar.dart';
 
 class AddHealthRecordScreen extends StatefulWidget {
   final String patientId;
@@ -18,7 +20,7 @@ class _AddHealthRecordScreenState extends State<AddHealthRecordScreen> {
   /// Adds a new health record to the patient's sub-collection.
   Future<void> _addHealthRecord() async {
     if (_symptomsController.text.isEmpty) {
-      print('Please enter symptoms.');
+      debugPrint('Please enter symptoms.');
       return;
     }
 
@@ -35,11 +37,12 @@ class _AddHealthRecordScreenState extends State<AddHealthRecordScreen> {
         'timestamp': FieldValue.serverTimestamp(),
       });
 
-      print('Health record added successfully for patient: ${widget.patientId}');
+      debugPrint('Health record added successfully for patient: ${widget.patientId}');
+      if (!mounted) return; // Check if the widget is still mounted
       Navigator.pop(context); // Go back after saving.
 
     } catch (e) {
-      print('Error adding health record: $e');
+      debugPrint('Error adding health record: $e');
     }
   }
 
@@ -53,8 +56,8 @@ class _AddHealthRecordScreenState extends State<AddHealthRecordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Add Health Record'),
+      appBar: const CustomAppBar(
+        title: Text('Add Health Record'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
