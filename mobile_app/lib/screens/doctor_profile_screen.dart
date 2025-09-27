@@ -1,9 +1,9 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:mobile_app/services/image_upload_service.dart'; // Import the service
 import 'package:mobile_app/widgets/custom_app_bar.dart';
 
 class DoctorProfileScreen extends StatefulWidget {
@@ -38,7 +38,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
 
     final doc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
     final data = doc.data();
-    if (data != null) {
+    if (data != null && mounted) {
       _nameController.text = data['name'] ?? '';
       _specialtyController.text = data['specialty'] ?? '';
       setState(() {
@@ -52,17 +52,6 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
     return await _picker.pickImage(source: ImageSource.gallery);
   }
 
-  Future<String?> _uploadImage(XFile image, String path) async {
-    try {
-      final ref = FirebaseStorage.instance.ref().child(path);
-      await ref.putFile(File(image.path));
-      return await ref.getDownloadURL();
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to upload image: $e')));
-      return null;
-    }
-  }
-
   Future<void> _saveProfile() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -74,13 +63,16 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
     String? newProfileUrl = _profileImageUrl;
     String? newLicenseUrl = _licenseImageUrl;
 
+    // Upload profile image if a new one was picked
     if (_profileImage != null) {
-      newProfileUrl = await _uploadImage(_profileImage!, 'user_profiles/${user.uid}.jpg');
+      newProfileUrl = await ImageUploadService().uploadImage(_profileImage!); 
     }
+    // Upload license image if a new one was picked
     if (_licenseImage != null) {
-      newLicenseUrl = await _uploadImage(_licenseImage!, 'doctor_licenses/${user.uid}.jpg');
+      newLicenseUrl = await ImageUploadService().uploadImage(_licenseImage!); 
     }
 
+    // Update Firestore with the new URLs
     await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
       'name': _nameController.text,
       'specialty': _specialtyController.text,
@@ -89,11 +81,12 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
       'licenseImageUrl': newLicenseUrl,
     }, SetOptions(merge: true));
 
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Profile saved successfully!')));
-
-    setState(() {
-      _isLoading = false;
-    });
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Profile saved successfully!')));
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -144,7 +137,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
           radius: 50,
           backgroundImage: _profileImage != null
               ? FileImage(File(_profileImage!.path))
-              : (_profileImageUrl != null
+              : (_profileImageUrl != null && _profileImageUrl!.isNotEmpty
                   ? NetworkImage(_profileImageUrl!)
                   : const NetworkImage('https://via.placeholder.com/150')) as ImageProvider,
         ),

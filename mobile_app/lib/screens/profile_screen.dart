@@ -38,16 +38,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     final doc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
     final data = doc.data();
-    if (data != null) {
+    if (data != null && mounted) {
       _nameController.text = data['name'] ?? '';
       _ageController.text = data['age']?.toString() ?? '';
       _fatherNameController.text = data['fatherName'] ?? '';
       _contactController.text = data['contactNumber'] ?? '';
-      if (mounted) {
-        setState(() {
-          _profileImageUrl = data['profilePictureUrl'];
-        });
-      }
+      setState(() {
+        _profileImageUrl = data['profilePictureUrl'];
+      });
     }
   }
 
@@ -68,21 +66,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
 
     final user = FirebaseAuth.instance.currentUser!;
-    String? imageUrl = _profileImageUrl; // Keep the existing image URL by default
+    String? imageUrl = _profileImageUrl;
 
-    // If a new image was picked, upload it to Cloudinary
     if (_profileImage != null) {
       imageUrl = await ImageUploadService().uploadImage(_profileImage!); 
     }
 
-    // Proceed only if the upload was successful or if no new image was picked
     if (imageUrl != null || _profileImage == null) {
         await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
             'name': _nameController.text,
             'age': int.tryParse(_ageController.text) ?? 0,
             'fatherName': _fatherNameController.text,
             'contactNumber': _contactController.text,
-            'email': user.email, // Save email for reference
+            'email': user.email,
             'profilePictureUrl': imageUrl,
         }, SetOptions(merge: true));
 

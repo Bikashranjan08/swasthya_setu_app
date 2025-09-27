@@ -1,3 +1,4 @@
+import 'package:mobile_app/screens/video_consultation_queue_screen.dart';
 import 'package:mobile_app/screens/pharmacy_stock_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -109,14 +110,31 @@ class _HomeScreenState extends State<HomeScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(
-          width: double.infinity,
-          height: 60.0,
-          child: ElevatedButton.icon(
-            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const DoctorPatientListScreen())),
-            icon: const Icon(Icons.people, size: 28.0),
-            label: const Text('View All Patients', style: TextStyle(fontSize: 18.0)),
-          ),
+        Row(
+          children: [
+            Expanded(
+              child: SizedBox(
+                height: 60.0,
+                child: ElevatedButton.icon(
+                  onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const DoctorPatientListScreen())),
+                  icon: const Icon(Icons.people, size: 28.0),
+                  label: const Text('View All Patients', style: TextStyle(fontSize: 18.0)),
+                ),
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: SizedBox(
+                height: 60.0,
+                child: ElevatedButton.icon(
+                  onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const VideoConsultationQueueScreen())),
+                  icon: const Icon(Icons.video_call, size: 28.0),
+                  label: const Text('Video Queue', style: TextStyle(fontSize: 18.0)),
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                ),
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 24.0),
         const Text('My Schedule', style: TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold)),
@@ -417,7 +435,7 @@ class _HomeScreenState extends State<HomeScreen> {
         });
 
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Reschedule request sent successfully!')),
+          const SnackBar(content: Text('Reschedule request sent successfully!')), 
         );
         // Optionally refresh appointments or update local state
       } catch (e) {
