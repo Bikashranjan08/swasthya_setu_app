@@ -7,6 +7,7 @@ import 'package:mobile_app/screens/login_screen.dart'; // Keep login screen for 
 import 'package:mobile_app/screens/add_patient_screen.dart'; // Keep add patient screen for routing
 import 'package:mobile_app/screens/home_screen.dart'; // Keep home screen for routing
 import 'package:mobile_app/screens/welcome_screen.dart'; // Keep welcome screen for routing
+import 'package:mobile_app/screens/pharmacy_stock_screen.dart'; // Import the new screen
 import 'firebase_options.dart';
 
 void main() async {
@@ -40,6 +41,7 @@ class MyApp extends StatelessWidget {
         },
         '/add_patient': (context) => const AddPatientScreen(),
         '/home': (context) => const HomeScreen(), // Explicit route for home screen
+        '/pharmacy_stock': (context) => const PharmacyStockScreen(), // New route for pharmacy stock
       },
     );
   }

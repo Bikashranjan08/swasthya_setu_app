@@ -29,6 +29,49 @@
             {
               "client_id": "219669880470-3svroa9uc5id4b45na163upuou2g893s.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "219669880470-1o1uk2hbmh4q1cq9piotcjtd9d6ld8pi.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.mobileApp"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:219669880470:android:2bfb4b25fdfc7c07912cb7",
+        "android_client_info": {
+          "package_name": "com.swasthyasetu.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "219669880470-3svroa9uc5id4b45na163upuou2g893s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDn8Fqkc24xW6KO7raN3eeugJs-zttOZk0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "219669880470-3svroa9uc5id4b45na163upuou2g893s.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "219669880470-1o1uk2hbmh4q1cq9piotcjtd9d6ld8pi.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.mobileApp"
+              }
             }
           ]
         }

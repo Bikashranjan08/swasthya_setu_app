@@ -1,9 +1,9 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:mobile_app/services/image_upload_service.dart'; // Import the new service
 import 'package:mobile_app/widgets/custom_app_bar.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -43,30 +43,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
       _ageController.text = data['age']?.toString() ?? '';
       _fatherNameController.text = data['fatherName'] ?? '';
       _contactController.text = data['contactNumber'] ?? '';
-      setState(() {
-        _profileImageUrl = data['profilePictureUrl'];
-      });
+      if (mounted) {
+        setState(() {
+          _profileImageUrl = data['profilePictureUrl'];
+        });
+      }
     }
   }
 
   Future<void> _pickImage() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
-    setState(() {
-      if (pickedFile != null) {
+    if (mounted && pickedFile != null) {
+      setState(() {
         _profileImage = pickedFile;
-      }
-    });
-  }
-
-  Future<String?> _uploadImage(XFile image) async {
-    try {
-      final user = FirebaseAuth.instance.currentUser!;
-      final ref = FirebaseStorage.instance.ref().child('user_profiles').child('${user.uid}.jpg');
-      await ref.putFile(File(image.path));
-      return await ref.getDownloadURL();
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to upload image: $e')));
-      return null;
+      });
     }
   }
 
@@ -78,12 +68,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
 
     final user = FirebaseAuth.instance.currentUser!;
-    String? imageUrl = _profileImageUrl;
+    String? imageUrl = _profileImageUrl; // Keep the existing image URL by default
 
+    // If a new image was picked, upload it to Cloudinary
     if (_profileImage != null) {
-      imageUrl = await _uploadImage(_profileImage!); 
+      imageUrl = await ImageUploadService().uploadImage(_profileImage!); 
     }
 
+    // Proceed only if the upload was successful or if no new image was picked
     if (imageUrl != null || _profileImage == null) {
         await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
             'name': _nameController.text,
@@ -94,14 +86,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
             'profilePictureUrl': imageUrl,
         }, SetOptions(merge: true));
 
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Profile saved successfully!')));
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Profile saved successfully!')));
+        }
     } else {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Profile could not be saved. Image upload failed.')));
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Profile could not be saved. Image upload failed.')));
+        }
     }
 
-    setState(() {
-      _isLoading = false;
-    });
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -162,7 +160,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           radius: 50,
           backgroundImage: _profileImage != null
               ? FileImage(File(_profileImage!.path))
-              : (_profileImageUrl != null
+              : (_profileImageUrl != null && _profileImageUrl!.isNotEmpty
                   ? NetworkImage(_profileImageUrl!)
                   : const NetworkImage('https://via.placeholder.com/150')) as ImageProvider,
         ),
