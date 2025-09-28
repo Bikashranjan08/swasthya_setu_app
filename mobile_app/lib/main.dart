@@ -22,7 +22,7 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
+// Trivial change to force Vercel to redeploy
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
