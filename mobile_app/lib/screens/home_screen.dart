@@ -165,29 +165,72 @@ class _HomeScreenState extends State<HomeScreen> {
                 itemBuilder: (context, index) {
                   final appointment = appointments[index];
                   final appointmentData = appointment.data() as Map<String, dynamic>;
-                  final patientName = appointmentData['patientName'] ?? 'N/A';
+                  final patientId = appointmentData['patientId'];
                   final appointmentTime = (appointmentData['appointmentTime'] as Timestamp).toDate();
                   final status = appointmentData['status'] ?? 'N/A';
 
-                  return Card(
-                    margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
-                    child: ListTile(
-                      leading: Icon(
-                        status == 'pending' ? Icons.hourglass_top : Icons.check_circle,
-                        color: status == 'pending' ? Colors.orange : Colors.green,
-                      ),
-                      title: Text(patientName),
-                      subtitle: Text('${appointmentTime.day}/${appointmentTime.month} at ${appointmentTime.hour}:${appointmentTime.minute.toString().padLeft(2, '0')}'),
-                      trailing: Text(status, style: TextStyle(color: status == 'pending' ? Colors.orange : Colors.green, fontWeight: FontWeight.bold)),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => AppointmentDetailsScreen(appointmentId: appointment.id),
+                  return FutureBuilder<DocumentSnapshot>(
+                    future: FirebaseFirestore.instance.collection('users').doc(patientId).get(),
+                    builder: (context, patientSnapshot) {
+                      if (patientSnapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                      if (patientSnapshot.hasError) {
+                        return Center(child: Text('Error: ${patientSnapshot.error}'));
+                      }
+                      if (!patientSnapshot.hasData || !patientSnapshot.data!.exists) {
+                        return const Center(child: Text('Patient not found.'));
+                      }
+
+                      final patientData = patientSnapshot.data!.data() as Map<String, dynamic>;
+                      final patientName = patientData['name'] ?? 'N/A';
+                      final patientAge = patientData['age'] ?? 'N/A';
+                      final patientContact = patientData['contact'] ?? 'N/A';
+
+                      return Card(
+                        margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+                        child: ListTile(
+                          leading: Icon(
+                            status == 'pending' ? Icons.hourglass_top : Icons.check_circle,
+                            color: status == 'pending' ? Colors.orange : Colors.green,
                           ),
-                        );
-                      },
-                    ),
+                          title: Text(patientName),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Age: $patientAge'),
+                              Text('Contact: $patientContact'),
+                              Text('${appointmentTime.day}/${appointmentTime.month} at ${appointmentTime.hour}:${appointmentTime.minute.toString().padLeft(2, '0')}'),
+                            ],
+                          ),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(status, style: TextStyle(color: status == 'pending' ? Colors.orange : Colors.green, fontWeight: FontWeight.bold)),
+                              IconButton(
+                                icon: const Icon(Icons.medical_information),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => HealthRecordsScreen(patientId: patientId),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => AppointmentDetailsScreen(appointmentId: appointment.id),
+                              ),
+                            );
+                          },
+                        ),
+                      );
+                    },
                   );
                 },
               );

@@ -6,7 +6,8 @@ import 'package:mobile_app/widgets/custom_app_bar.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class HealthRecordsScreen extends StatefulWidget {
-  const HealthRecordsScreen({super.key});
+  final String? patientId;
+  const HealthRecordsScreen({Key? key, this.patientId}) : super(key: key);
 
   @override
   State<HealthRecordsScreen> createState() => _HealthRecordsScreenState();
@@ -33,14 +34,15 @@ class _HealthRecordsScreenState extends State<HealthRecordsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final userId = widget.patientId ?? _auth.currentUser!.uid;
     return Scaffold(
-      appBar: const CustomAppBar(
+      appBar: CustomAppBar(
         title: Text('My Health Records'),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: _firestore
             .collection('healthRecords')
-            .where('patientId', isEqualTo: _auth.currentUser!.uid)
+            .where('patientId', isEqualTo: userId)
             .orderBy('date', descending: true)
             .snapshots(),
         builder: (context, snapshot) {
