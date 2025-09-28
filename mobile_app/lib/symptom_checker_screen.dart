@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tflite_flutter/tflite_flutter.dart';
+// import 'package:tflite_flutter/tflite_flutter.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
 class SymptomCheckerScreen extends StatefulWidget {
@@ -40,7 +40,7 @@ class _SymptomCheckerScreenState extends State<SymptomCheckerScreen> {
   bool _showResult = false;
   bool _isLoading = false;
 
-  Interpreter? _interpreter;
+  // Interpreter? _interpreter;
   List<String>? _labels;
 
   @override
@@ -50,6 +50,7 @@ class _SymptomCheckerScreenState extends State<SymptomCheckerScreen> {
   }
 
   Future<void> _loadModel() async {
+    /*
     try {
       final interpreterOptions = InterpreterOptions();
       _interpreter = await Interpreter.fromAsset('assets/model.tflite', options: interpreterOptions);
@@ -57,9 +58,11 @@ class _SymptomCheckerScreenState extends State<SymptomCheckerScreen> {
     } catch (e) {
       print('Error loading model: $e');
     }
+    */
   }
 
   Future<void> _runInference() async {
+    /*
     if (_interpreter == null || _labels == null) {
       print('Interpreter or labels not loaded');
       return;
@@ -111,6 +114,8 @@ class _SymptomCheckerScreenState extends State<SymptomCheckerScreen> {
       _isLoading = false;
       _showResult = true;
     });
+    */
+    print("AI Feature is temporarily disabled for web.");
   }
 
   @override
@@ -138,12 +143,12 @@ class _SymptomCheckerScreenState extends State<SymptomCheckerScreen> {
             );
           }).toList(),
           const SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: _isLoading ? null : _runInference,
-            child: _isLoading
-                ? const CircularProgressIndicator(color: Colors.white)
-                : const Text('Analyze Symptoms'),
-          ),
+          // ElevatedButton(
+          //   onPressed: null,
+          //   child: _isLoading
+          //       ? const CircularProgressIndicator(color: Colors.white)
+          //       : const Text('Analyze Symptoms'),
+          // ),
           const SizedBox(height: 20),
           if (_showResult)
             Card(
